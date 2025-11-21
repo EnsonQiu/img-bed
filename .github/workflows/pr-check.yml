@@ -1,0 +1,19 @@
+name: PR Checks
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Summarize changes
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          DELETED=$(git diff --name-status "$BASE_SHA" "$HEAD_SHA" | awk '$1=="D"{print $2}' | wc -l | tr -d ' ')
+          CHANGED=$(git diff --name-status "$BASE_SHA" "$HEAD_SHA" | wc -l | tr -d ' ')
+          echo "Deleted files: $DELETED"
+          echo "Total changed: $CHANGED"
